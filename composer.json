@@ -1,0 +1,16 @@
+{
+    "name": "imim320/blog",
+    "type": "project",
+    "license": "mit",
+    "minimum-stability": "dev",
+    "require": {
+      "ext-pdo": "*",
+      "ext-mysqli": "*",
+        "webmozart/assert": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blog\\": "src/"
+        }
+    }
+}

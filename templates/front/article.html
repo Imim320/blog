@@ -1,0 +1,38 @@
+<h1 class="mt-5">{{title}}</h1>
+<hr class="my-12"/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{imgLink}}" style="width: 100%"/>
+            </div>
+            <div class="col-md-8">
+                <div>{{content}}</div>
+                <div><a href="{{origin}}">Zrodlo</a></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr class="my-12"/>
+<h2 class="mt-5">Komentarze</h2>
+
+<div>
+    <h4>Dodaj:</h4>
+    <form action="/comment/new" method="post">
+        <input name="articleId" value="{{id}}" style="display: none">
+        <div class="form-group">
+            <label for="commentUsername">Nazwa uzytkownika</label>
+            <input class="form-control" id="commentUsername" name="commentUsername" value="Anonimowy">
+        </div>
+        <div class="form-group">
+            <label for="commentContent">Tresc</label>
+            <textarea class="form-control" id="commentContent" name="commentContent" placeholder="Dodaj tresc..." rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary margin-v-sm">Dodaj</button>
+    </form>
+</div>
+<hr class="my-12"/>
+<div>
+    {{comments}}
+</div>

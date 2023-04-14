@@ -1,0 +1,48 @@
+<div>
+    <h5>Nowy:</h5>
+    <form action="/admin/article/new" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="title">Tytul</label>
+                    <input class="form-control" id="title" name="title"  required="">
+                </div>
+                <div class="form-group">
+                    <label for="imgLink">Link do obrazu</label>
+                    <input class="form-control" id="imgLink" name="imgLink"  required="">
+                </div>
+                <div class="form-group">
+                    <label for="origin">Zrodlo</label>
+                    <input class="form-control" id="origin" name="origin"  required="">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="content">Tresc</label>
+                    <textarea class="form-control" id="content" name="content" required="" placeholder="Dodaj tresc..." rows="6"></textarea>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary margin-v-sm">Dodaj</button>
+    </form>
+</div>
+<hr class="my-12"/>
+
+<div>
+    <h5>Lista:</h5>
+    <table class="table table-striped" id="articles-table">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Tytul</th>
+            <th scope="col">Obraz</th>
+            <th scope="col">Zrodlo</th>
+            <th scope="col">Tresc</th>
+            <th scope="col">Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{articles}}
+        </tbody>
+    </table>
+</div>
