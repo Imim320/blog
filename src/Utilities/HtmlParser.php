@@ -4,7 +4,7 @@ namespace Blog\Utilities;
 
 class HtmlParser
 {
-    private const TEMPLATE_LOCATION = 'C:\xampp\blog\templates\\';
+    private const TEMPLATE_LOCATION = 'C:\xampp\htdocs\templates\\';
 
     public static function parse(string $template, array $data = []): string
     {

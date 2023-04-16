@@ -11,6 +11,10 @@ use Blog\Repository\Comment\MySQL as CommentRepository;
 use Blog\Service\CommentService;
 use Blog\Service\SecurityService;
 
+if (\PHP_SESSION_NONE === session_status()) {
+    session_start();
+}
+
 require 'vendor/autoload.php';
 $articleService = new ArticleService(
     new ArticleRepository(

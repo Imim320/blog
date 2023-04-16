@@ -12,6 +12,7 @@ class SecurityService
     {
         $accountKey = sprintf('%s_%s', $login, base64_encode($password));
         if (in_array($accountKey, self::ADMINS_IN_MEMORY)) {
+            session_start();
             $_SESSION['isAdminAuthorized'] = 1;
             return true;
         }
@@ -21,7 +22,6 @@ class SecurityService
 
     public function isAuthorized(): bool
     {
-        session_start();
         return $_SESSION['isAdminAuthorized'] ?? false;
     }
 }
