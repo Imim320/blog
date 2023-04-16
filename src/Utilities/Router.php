@@ -88,6 +88,12 @@ class Router
                 );
             }
         }
+
+        if (preg_match('/\/admin\/logout/', $request)) {
+            session_destroy();
+            return $this->frontController->viewHomePage();
+
+        }
 //        if (preg_match('/\/admin\/article\/edit\/\d{1}/', $request))
 //        {
 //            return $this->adminController->editArticle();
