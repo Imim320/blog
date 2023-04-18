@@ -95,4 +95,10 @@ class AdminController
 
         return new RedirectResponse('/admin/login?error=1');
     }
+
+    public function logoutAdmin(): Response
+    {
+        session_destroy();
+        return new RedirectResponse('/');
+    }
 }

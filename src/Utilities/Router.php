@@ -6,10 +6,25 @@ use Blog\Controller\AdminController;
 use Blog\Controller\FrontController;
 use Blog\Response\Response;
 use Blog\Response\PageNotFoundResponse;
-use Webmozart\Assert\Assert;
+use Blog\Validator\AdminInputValidator;
+use Blog\Validator\FrontInputValidator;
 
 class Router
 {
+    private const ROUTES = [
+        'root' => '/\/$/',
+        'article_view' => '/\/article\/view\/\d{1}/',
+        'comment_new' => '/\/comment\/new/',
+        'admin_login' => '/\/admin\/login/',
+        'admin_authorize' => '/\/admin\/authorize/',
+        'admin_articles' => '/\/admin\/articles/',
+        'admin_article_new' => '/\/admin\/article\/new/',
+        'admin_article_delete' => '/\/admin\/article\/delete\/\d{1}/',
+        'admin_logout' => '/\/admin\/logout/',
+        'not_found' => '/\/404$/',
+        'error' => '/\/error$/'
+    ];
+
     private AdminController $adminController;
     private FrontController $frontController;
 
@@ -19,106 +34,65 @@ class Router
         $this->frontController = $frontController;
     }
 
+
     public function route(): Response
     {
-        $request = $_SERVER['REQUEST_URI'];
-        if (preg_match('/\/$/', $request)) {
-            return $this->frontController->viewHomePage();
-        }
-        if (preg_match('/\/article\/view\/\d{1}/', $request)) {
-            $request = $_SERVER['REQUEST_URI'];
-            if (preg_match(('/\/article\/view\/\d{1}/'), $request)) {
+        $request = new Request($_GET, $_POST, [], $_SERVER);
+        switch ($this->matchRoute($request)) {
+            case 'root':
+                return $this->frontController->viewHomePage();
+            case 'article_view':
                 return $this->frontController->viewArticlePage(
-                    (int)filter_var($request, FILTER_SANITIZE_NUMBER_INT)
+                    (int)filter_var($request->getUri(), FILTER_SANITIZE_NUMBER_INT)
                 );
-            }
-        }
-        if (preg_match('/\/comment\/new/', $request)) {
-            Assert::keyExists($_POST, 'articleId');
-            Assert::keyExists($_POST, 'commentUsername');
-            Assert::keyExists($_POST, 'commentContent');
-            Assert::notEmpty($_POST['articleId']);
-            Assert::notEmpty($_POST['commentUsername']);
-            Assert::notEmpty($_POST['commentContent']);
+            case 'comment_new':
+                FrontInputValidator::assertNewCommentValidator($_POST);
 
-            return $this->frontController->createNewArticle(
-                $_POST['commentUsername'],
-                $_POST['commentContent'],
-                (int)$_POST['articleId']
-            );
-        }
-        if (preg_match('/\/admin\/login/', $request)) {
-            return $this->adminController->viewLoginPage(!empty($_GET['error'] ?? null));
-        }
-        if (preg_match('/\/admin\/authorize/', $request)) {
-            Assert::keyExists($_POST, 'login');
-            Assert::keyExists($_POST, 'password');
-            Assert::notEmpty($_POST['login']);
-            Assert::notEmpty($_POST['password']);
+                return $this->frontController->createNewArticle(
+                    $_POST['commentUsername'],
+                    $_POST['commentContent'],
+                    (int)$_POST['articleId']
+                );
+            case 'admin_login':
+                return $this->adminController->viewLoginPage(!empty($_GET['error'] ?? null));
+            case 'admin_authorize':
+                AdminInputValidator::assertAuthorizeValidator($_POST);
+                return $this->adminController->authorizeAdmin($_POST['login'], $_POST['password']);
+            case 'admin_articles':
+                return $this->adminController->viewArticlesPage();
+            case 'admin_article_new':
+                AdminInputValidator::assertNewArticleValidator($_POST);
 
-            return $this->adminController->authorizeAdmin($_POST['login'], $_POST['password']);
-        }
-        if (preg_match('/\/admin\/articles/', $request)) {
-            return $this->adminController->viewArticlesPage();
-        }
-
-        if (preg_match('/\/admin\/article\/new/', $request)) {
-            Assert::keyExists($_POST, 'title');
-            Assert::keyExists($_POST, 'imgLink');
-            Assert::keyExists($_POST, 'origin');
-            Assert::keyExists($_POST, 'content');
-            Assert::notEmpty($_POST['title']);
-            Assert::notEmpty($_POST['imgLink']);
-            Assert::notEmpty($_POST['origin']);
-            Assert::notEmpty($_POST['content']);
-
-            return $this->adminController->createNewArticle(
-                $_POST['title'],
-                $_POST['imgLink'],
-                $_POST['origin'],
-                $_POST['content']
-            );
-        }
-
-        if (preg_match('/\/admin\/article\/delete\/\d{1}/', $request)) {
-            $request = $_SERVER['REQUEST_URI'];
-            if (preg_match(('/\/admin\/article\/delete\/\d{1}/'), $request)) {
+                return $this->adminController->createNewArticle(
+                    $_POST['title'],
+                    $_POST['imgLink'],
+                    $_POST['origin'],
+                    $_POST['content']
+                );
+            case 'admin_article_delete':
                 return $this->adminController->deleteArticle(
-                    (int)filter_var($request, FILTER_SANITIZE_NUMBER_INT)
+                    (int)filter_var($request->getUri(), FILTER_SANITIZE_NUMBER_INT)
                 );
+            case 'admin_logout':
+                return $this->adminController->logoutAdmin();
+            case 'not_found':
+                return $this->frontController->viewPageNotFoundPage();
+            case 'error':
+                return $this->frontController->viewErrorPage();
+            default:
+                return new PageNotFoundResponse();
+        }
+    }
+
+    private function matchRoute(Request $request): ?string
+    {
+        foreach (self::ROUTES as $name => $pattern)
+        {
+            if (preg_match($pattern, $request->getUri()))
+            {
+                return $name;
             }
         }
-
-        if (preg_match('/\/admin\/logout/', $request)) {
-            session_destroy();
-            return $this->frontController->viewHomePage();
-
-        }
-//        if (preg_match('/\/admin\/article\/edit\/\d{1}/', $request))
-//        {
-//            return $this->adminController->editArticle();
-//        }
-//        if (preg_match('/\/admin\/article\/save\/\d{1}/', $request))
-//        {
-//            return $this->adminController->saveArticle();
-//        }
-//        if (preg_match('/\/admin\/article\/delete\/\d{1}/', $request))
-//        {
-//            return $this->adminController->deleteArticle();
-//        }
-//        if (preg_match('/\/admin\/article\/login/', $request))
-//        {
-//            return $this->adminController->loginPage();
-//        }
-
-        if (preg_match('/\/404$/', $request)) {
-            return $this->frontController->viewPageNotFoundPage();
-        }
-
-        if (preg_match('/\/error$/', $request)) {
-            return $this->frontController->viewErrorPage();
-        }
-
-        return new PageNotFoundResponse();
+        return null;
     }
 }
