@@ -9,6 +9,7 @@ use Blog\Response\RedirectResponse;
 use Blog\Response\Response;
 use Blog\Service\ArticleService;
 use Blog\Service\CommentService;
+use Blog\Service\SecurityService;
 use Blog\Utilities\HtmlParser;
 use Blog\Utilities\ArticleHelper;
 use Blog\Response\HtmlResponse;
@@ -17,11 +18,13 @@ class FrontController
 {
     private ArticleService $articleService;
     private CommentService $commentsService;
+    private SecurityService $securityService;
 
-    public function __construct(ArticleService $articleService, CommentService $commentsService)
+    public function __construct(ArticleService $articleService, CommentService $commentsService, SecurityService $securityService)
     {
         $this->articleService = $articleService;
         $this->commentsService = $commentsService;
+        $this->securityService = $securityService;
     }
 
     public function viewHomePage(): Response
@@ -32,6 +35,8 @@ class FrontController
             HtmlParser::parse(
                 'front\base.html',
                 [
+                    'adminLoginActionName' => $this->securityService->isAuthorized() ? 'Wyloguj':'Zaloguj',
+                    'adminLoginActionLink' => $this->securityService->isAuthorized() ? '/admin/logout':'/admin/login',
                     'content' => HtmlParser::parse(
                         'front\main_page.html',
                         [

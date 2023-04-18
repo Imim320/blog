@@ -32,7 +32,7 @@ $commentService = new CommentService(
 $securityService = new SecurityService();
 $router = new Router(
     new AdminController($securityService, $articleService),
-    new FrontController($articleService, $commentService)
+    new FrontController($articleService, $commentService, $securityService)
 );
 
 try {

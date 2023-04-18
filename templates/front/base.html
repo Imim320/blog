@@ -15,11 +15,9 @@
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="/">
             <img class='margin-w-sm' src="/assets/logo.png" height="30" class="d-inline-block align-top" alt="">
-            <a href="/admin/articles">
-                <button class="btn btn-secondary" type="button">Admin panel</button>
-            </a>
-            <a href="/admin/logout">
-                <button class="btn btn-secondary" type="button">Wyloguj</button>
+
+            <a href="{{adminLoginActionLink}}">
+                <button class="btn btn-secondary margin-w-sm" type="button">{{adminLoginActionName}}</button>
             </a>
         </a>
     </nav>
